@@ -1,23 +1,19 @@
 import Joi from "joi";
 
-const id = Joi.number().positive();
-const name = Joi.string().min(2).max(50);
-const code = Joi.string().min(2).max(50);
+const id = Joi.number().positive().integer();
+const name = Joi.string().min(2).max(255);
+const photo = Joi.string().max(255).allow(null)
 
-export const menuCreateDto = Joi.object({
+export const createMenuDto = Joi.object({
   name: name.required(),
-  code: code.required()
+  photo,
 });
 
-export const menuUpdateDto = Joi.object({
+export const updateMenuDto = Joi.object({
   name,
-  code
+  photo
 });
 
 export const getMenuDto = Joi.object({
   id: id.required(),
 });
-
-export const getMenuByCodeDto = Joi.object({
-  code: code.required()
-})

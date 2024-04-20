@@ -1,18 +1,14 @@
 import express, { NextFunction, Request, Response } from "express";
+import passport from "passport";
 
 import { MenuService } from "../services/menu.service";
 import { validatorHandler } from "../middleware";
-import {
-  getMenuByCodeDto,
-  getMenuDto,
-  menuCreateDto,
-  menuUpdateDto,
-} from "../dtos/menu.dto";
+import { getMenuDto, createMenuDto, updateMenuDto } from "../dtos/menu.dto";
 
 export const router = express.Router();
 const menuService = new MenuService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", passport.authenticate("api-key", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const menus = await menuService.find();
     res.json(menus);
@@ -21,74 +17,43 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.get(
-  "/:id",
-  validatorHandler(getMenuDto, "params"),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const menu = await menuService.findOne(id);
-      res.json(menu);
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.get("/data", passport.authenticate("jwt", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const payload: any = req.user;
+    const menuId = payload.sub;
+    const menu = await menuService.findOne(menuId);
+    res.json(menu);
+  } catch (error) {
+    next(error);
+  }
+});
 
-router.get(
-  "/code/:code",
-  validatorHandler(getMenuByCodeDto, "params"),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { code } = req.params;
-      const menu = await menuService.findByCode(code);
-      res.json(menu);
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.post("/", passport.authenticate("jwt", { session: false }), validatorHandler(createMenuDto, "body"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { body } = req;
+    res.status(201).json(await menuService.create(body));
+  } catch (error) {
+    next(error);
+  }
+});
 
-router.post(
-  "/",
-  validatorHandler(menuCreateDto, "body"),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { body } = req;
-      await menuService.create(body);
-      res.status(201).json({ message: "menu creado" });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.put("/:id", passport.authenticate("jwt", { session: false }), validatorHandler(getMenuDto, "params"), validatorHandler(updateMenuDto, "body"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+    const menu = await menuService.update(id, body);
+    res.status(201).json(menu);
+  } catch (error) {
+    next(error);
+  }
+});
 
-router.put(
-  "/:id",
-  validatorHandler(getMenuDto, "params"),
-  validatorHandler(menuUpdateDto, "body"),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const { body } = req;
-      await menuService.update(id, body);
-      res.status(201).json({ message: "menu actualizado" });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
-
-router.delete(
-  "/:id",
-  validatorHandler(getMenuDto, "params"),
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      await menuService.remove(id);
-      res.status(201).json({ message: "menu eliminado" });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.delete("/:id", passport.authenticate("jwt", { session: false }), validatorHandler(getMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    await menuService.remove(id);
+    res.status(201).json({ message: "Menu eliminado" });
+  } catch (error) {
+    next(error);
+  }
+});

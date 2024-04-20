@@ -6,34 +6,39 @@ import { insert, remove, select, update } from "./private/database.service";
 export class SectionService {
   constructor() {}
 
-  async find() {
-    const sections = await select<Section>({ table: "sections" })
+  async find(columns?: string[]) {
+    const sections = await select<Section[]>({ table: "sections", columns });
     return sections;
   }
 
-  async findOne(id: string) {
-    const sections = await select<Section>({ table: "sections", where: { id: { equal: id } } })
-    if(sections.length === 0) throw boom.notFound("No se encontro seccion con #id" + id);
-    return sections;
+  async findOne(id: string, columns?: string[]) {
+    const sections = await select<Section[]>({ table: "sections", columns, where: { id: { equal: id } } });
+    //if (sections.length === 0) throw boom.notFound("No se encontro seccion con #id" + id);
+    //return sections[0];
+    return[]
   }
 
   async findByMenuId(menuId: string) {
-    const sections = await select<Section>({ table: "sections", where: { menuId: { equal: menuId } } })
-    if(sections.length === 0) throw boom.notFound("No se encontro seccion con #menuId " + menuId);
+    const sections = await select<Section[]>({ table: "sections", where: { menuId: { equal: menuId } } });
+    if (sections.length === 0) throw boom.notFound("No se encontro seccion con #menuId " + menuId);
     return sections;
   }
 
-  async create(newSection: { name: string, menuId: number }) {
-    await insert({ table: "sections", values: newSection })
+  async create(newSection: { name: string; menuId: number }) {
+    const result = await insert({ table: "sections", values: newSection });
+    if (result) {
+      return await this.findOne(result.insertId.toString());
+    }
   }
 
-  async update(id: string, changes: { name?: string, menuId?: number }) {
+  async update(id: string, changes: { name?: string; menuId?: number }) {
     await this.findOne(id);
-    await update({ table: "sections", values: changes, where: { id: { equal: id } }})
+    await update({ table: "sections", values: changes, where: { id: { equal: id } } });
+    return await this.findOne(id);
   }
 
   async remove(id: string) {
     await this.findOne(id);
-    await remove({ table: "sections", where: { id: { equal: id } } })
+    await remove({ table: "sections", where: { id: { equal: id } } });
   }
 }
