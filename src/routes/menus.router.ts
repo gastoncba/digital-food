@@ -28,7 +28,7 @@ router.get("/data", passport.authenticate("jwt", { session: false }), async (req
   }
 });
 
-router.post("/", passport.authenticate("jwt", { session: false }), validatorHandler(createMenuDto, "body"), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/", validatorHandler(createMenuDto, "body"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { body } = req;
     res.status(201).json(await menuService.create(body));
