@@ -8,7 +8,7 @@ import { getMenuDto, createMenuDto, updateMenuDto } from "../dtos/menu.dto";
 export const router = express.Router();
 const menuService = new MenuService();
 
-router.get("/", passport.authenticate("api-key", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/all", passport.authenticate("api-key", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const menus = await menuService.find();
     res.json(menus);
@@ -17,11 +17,21 @@ router.get("/", passport.authenticate("api-key", { session: false }), async (req
   }
 });
 
-router.get("/data", passport.authenticate("jwt", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", passport.authenticate("jwt", { session: false }), validatorHandler(getMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const menu = await menuService.findOne(id, ["id", "name", "photo"]);
+    res.json(menu);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/", passport.authenticate("jwt", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload: any = req.user;
     const menuId = payload.sub;
-    const menu = await menuService.findOne(menuId);
+    const menu = await menuService.findOne(menuId, ["id", "name", "photo"]);
     res.json(menu);
   } catch (error) {
     next(error);

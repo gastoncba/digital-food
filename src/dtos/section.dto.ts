@@ -17,3 +17,7 @@ export const updateSectionDto = Joi.object({
 export const getSectionDto = Joi.object({
   id: id.required(),
 });
+
+export const getSectionByMenuDto = Joi.object({
+  menuId: menuId.required(),
+});

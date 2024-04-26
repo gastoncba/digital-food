@@ -3,12 +3,12 @@ import passport from "passport";
 
 import { SectionService } from "../services/section.service";
 import { validatorHandler } from "../middleware";
-import { createSectionDto, getSectionDto, updateSectionDto } from "../dtos/section.dto";
+import { createSectionDto, getSectionByMenuDto, getSectionDto, updateSectionDto } from "../dtos/section.dto";
 
 export const router = express.Router();
 const sectionService = new SectionService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", passport.authenticate("api-key", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sections = await sectionService.find();
     res.json(sections);
@@ -53,6 +53,16 @@ router.delete("/:id", passport.authenticate("jwt", { session: false }), validato
     const { id } = req.params;
     await sectionService.remove(id);
     res.status(201).json({ message: "Sección Eliminada" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/menu/:menuId", validatorHandler(getSectionByMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { menuId } = req.params;
+    const sections = await sectionService.findByMenuId(menuId);
+    res.json(sections);
   } catch (error) {
     next(error);
   }

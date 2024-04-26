@@ -3,12 +3,12 @@ import passport from "passport";
 
 import { FoodService } from "../services/food.service";
 import { validatorHandler } from "../middleware";
-import { createFoodDto, getFoodDto, updateFoodDto } from "../dtos/food.dto";
+import { createFoodDto, getFoodBySectionDto, getFoodDto, updateFoodDto } from "../dtos/food.dto";
 
 export const router = express.Router();
 const foodService = new FoodService();
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/", passport.authenticate("api-key", { session: false }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const foods = await foodService.find(["name", "photo"]);
     res.json(foods);
@@ -53,6 +53,16 @@ router.delete("/:id", passport.authenticate("jwt", { session: false }), validato
     const { id } = req.params;
     await foodService.remove(id);
     res.status(201).json({ message: "Comida eliminada" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/section/sectionId", validatorHandler(getFoodBySectionDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { sectionId } = req.params;
+    const food = await foodService.findBySectionId(sectionId);
+    res.json(food);
   } catch (error) {
     next(error);
   }

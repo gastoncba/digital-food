@@ -13,9 +13,8 @@ export class SectionService {
 
   async findOne(id: string, columns?: string[]) {
     const sections = await select<Section[]>({ table: "sections", columns, where: { id: { equal: id } } });
-    //if (sections.length === 0) throw boom.notFound("No se encontro seccion con #id" + id);
-    //return sections[0];
-    return[]
+    if (sections.length === 0) throw boom.notFound("No se encontro seccion con #id" + id);
+    return sections[0];
   }
 
   async findByMenuId(menuId: string) {

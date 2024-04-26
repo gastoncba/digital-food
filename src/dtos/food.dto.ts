@@ -31,3 +31,7 @@ export const updateFoodDto = Joi.object({
 export const getFoodDto = Joi.object({
   id: id.required(),
 });
+
+export const getFoodBySectionDto = Joi.object({
+  sectionId: sectionId.required(),
+});
