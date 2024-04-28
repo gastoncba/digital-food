@@ -17,9 +17,8 @@ export class SectionService {
     return sections[0];
   }
 
-  async findByMenuId(menuId: string) {
-    const sections = await select<Section[]>({ table: "sections", where: { menuId: { equal: menuId } } });
-    if (sections.length === 0) throw boom.notFound("No se encontro seccion con #menuId " + menuId);
+  async findByMenuId(menuId: string, columns?: string[]) {
+    const sections = await select<Section[]>({ table: "sections", columns, where: { menuId: { equal: menuId } } });
     return sections;
   }
 

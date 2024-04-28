@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import { router as menusRouter } from "./menus.router";
-import { router as sectionsRouter } from "./menus.router";
+import { router as sectionsRouter } from "./sections.router";
 import { router as foodsRouter } from "./foods.router";
 import { router as authRouter } from './auth.router';
 

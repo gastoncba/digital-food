@@ -27,6 +27,16 @@ router.get("/:id", validatorHandler(getSectionDto, "params"), async (req: Reques
   }
 });
 
+router.get("/menu/:menuId", validatorHandler(getSectionByMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { menuId } = req.params;
+    const sections = await sectionService.findByMenuId(menuId, ["id", "name"]);
+    res.json(sections);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/", passport.authenticate("jwt", { session: false }), validatorHandler(createSectionDto, "body"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { body } = req;
@@ -53,16 +63,6 @@ router.delete("/:id", passport.authenticate("jwt", { session: false }), validato
     const { id } = req.params;
     await sectionService.remove(id);
     res.status(201).json({ message: "Sección Eliminada" });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/menu/:menuId", validatorHandler(getSectionByMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { menuId } = req.params;
-    const sections = await sectionService.findByMenuId(menuId);
-    res.json(sections);
   } catch (error) {
     next(error);
   }
