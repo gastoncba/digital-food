@@ -27,7 +27,7 @@ router.get("/:id", validatorHandler(getFoodDto, "params"), async (req: Request, 
   }
 });
 
-router.get("/section/sectionId", validatorHandler(getFoodBySectionDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/section/:sectionId", validatorHandler(getFoodBySectionDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { sectionId } = req.params;
     const food = await foodService.findBySectionId(sectionId);

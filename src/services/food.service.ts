@@ -20,7 +20,7 @@ export class FoodService {
     return foods;
   }
 
-  async create(newFood: { id: number; name: string; description: string; price: number; ingredients: string; sectionId: number; photo: string }) {
+  async create(newFood: { id: number; name: string; description: string; price: number; ingredients?: string; sectionId: number; photo: string }) {
     const result = await insert({ table: "foods", values: newFood });
     if (result) {
       return await this.findOne(result.insertId.toString());

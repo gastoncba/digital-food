@@ -9,7 +9,6 @@ const sectionId = Joi.number().positive().integer();
 const photo = Joi.string().min(2).max(255).allow(null);
 
 export const createFoodDto = Joi.object({
-  id: id.required(),
   name: name.required(),
   description: description.required(),
   price: price.required(),
@@ -19,7 +18,6 @@ export const createFoodDto = Joi.object({
 });
 
 export const updateFoodDto = Joi.object({
-  id,
   name,
   description,
   price,
