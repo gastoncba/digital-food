@@ -29,7 +29,7 @@ export class FoodService {
 
   async update(id: string, changes: { name?: string; description?: string; price?: number; ingredients?: string; sectionId?: number; photo?: string }) {
     await this.findOne(id);
-    await update({ table: "foods", values: changes });
+    await update({ table: "foods", values: changes, where: { id: { equal: id } } });
     return this.findOne(id);
   }
 
