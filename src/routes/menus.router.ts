@@ -17,7 +17,7 @@ router.get("/all", passport.authenticate("api-key", { session: false }), async (
   }
 });
 
-router.get("/:id", passport.authenticate("jwt", { session: false }), validatorHandler(getMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
+router.get("/:id", passport.authenticate("api-key", { session: false }), validatorHandler(getMenuDto, "params"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const menu = await menuService.findOne(id, ["id", "name", "photo"]);
