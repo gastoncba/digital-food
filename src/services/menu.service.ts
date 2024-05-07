@@ -33,7 +33,7 @@ export class MenuService {
   async update(id: string, changes: { name?: string; code?: string; photo?: string }) {
     await this.findOne(id);
     await update({ table: "menus", values: changes, where: { id: { equal: id } } });
-    return await this.findOne(id);
+    return await this.findOne(id, ["id", "name", "photo"]);
   }
 
   async remove(id: string) {
